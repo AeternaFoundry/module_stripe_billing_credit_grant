@@ -39,5 +39,29 @@ EOT
     name             = optional(string)
     priority         = optional(number)
   }))
+  validation {
+    condition = alltrue([
+      for k, v in var.billing_credit_grants : (
+        contains(["monetary"], v.amount.type)
+      )
+    ])
+    error_message = "must be one of: \"monetary\""
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.billing_credit_grants : (
+        v.applicability_config.scope.price_type == null || (contains(["metered"], v.applicability_config.scope.price_type))
+      )
+    ])
+    error_message = "must be one of: \"metered\""
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.billing_credit_grants : (
+        v.category == null || (contains(["paid", "promotional"], v.category))
+      )
+    ])
+    error_message = "must be one of: \"paid\", \"promotional\""
+  }
 }
 
